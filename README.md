@@ -1,5 +1,6 @@
 # SpeakerSwitch
 Speaker Switch
+W urządzeniu wykorzystany został moduł WeMos D1 mini.
 Układ pozwala przełączać głośniki.
 W stanie normalnym (bez zasilania) załączone są głośniki A.
 http://IP/speaker/B - załącza głośniki B

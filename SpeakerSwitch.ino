@@ -9,13 +9,13 @@
 #define pinRelay1 D8
 #define pinRelay2 D7
 //#define IP_STATIC
-#define DEBUG
+//#define DEBUG
 //#define DEBUG_ON
 
 
- String version = "1.0.1";
- const char* ssid = "                                                                "; //64 char
- const char* pass = "                                                                "; //64 char
+String version = "1.0.1";
+const char* ssid = "                                                                "; //64 char
+const char* pass = "                                                                "; //64 char
 
 const char* myssid = "TEST";
 const char* mypass = "testtest";
@@ -26,15 +26,14 @@ const char* ap_pass = "12345678";  // password do AP
 int ap_channel= 5; //numer kanału dla AP
 Relay R1;
 Relay R2;
-//strDateTime dateTime;
 
 extern ESP8266WebServer server;
 extern const char* modes[] ; //= {"NULL","STA","AP","STA+AP"
 extern const char* phymodes[]; // = { "","B", "G", "N"};
 unsigned long minutes5 = 60000*5;
 unsigned long currentTime = 0;
-uint8_t etemp = 0;
-uint8_t Eetemp = 63;
+uint8_t etemp = 0;    // zmienne określająca czy należy zmienić zawarość EEPROM.
+uint8_t Eetemp = 63; //adres w EEPROM
 
 #ifdef IP_STATIC
 IPAddress IPadr(10,110,2,105); //stały IP
@@ -61,53 +60,41 @@ void setup()
   WiFi.config(IPadr,gateway,netmask);  // stały IP
 #endif
   WiFi.mode(WIFI_AP_STA); //tryb AP_STATION
-  //  etemp = 1;
-  // EEPROM.begin(128);
- //  EEPROM.put(63,0);
+
   EEPROM.begin(128);
   delay(20);
   EEPROM.get(Eetemp,etemp);
-//etemp = 1;
+
 #ifdef DEBUG
   Serial.print("etemp = ");
   Serial.println(etemp);
   #endif
   if (etemp==0xFF or etemp==0){
-    etemp = 1;
- EEPROM.put(0, myssid);
- EEPROM.put(64, mypass);
- EEPROM.put(Eetemp,etemp);
-// EEPROM.commit();
- delay(30); 
-  EEPROM.get(0, ssid);
-  EEPROM.get(64, pass);
+   etemp = 1;
+   EEPROM.put(0, myssid);
+   EEPROM.put(64, mypass);
+   EEPROM.put(Eetemp,etemp);
+   delay(30); 
+   EEPROM.get(0, ssid);
+   EEPROM.get(64, pass);
  
    WiFi.begin(ssid, pass);
    
   }else{
    WiFi.begin(); 
   };
-   EEPROM.end();
-//if((sizeof(ssid)>=4) && (sizeof(pass)>=8)) {
-//  Serial.println("ssid i pass");
-//  WiFi.begin(ssid, pass);
-//}else {
-//  Serial.println("brak ssid i pass");
-// //  WiFi.begin(ssid, pass);
-//  WiFi.begin(); 
-//};
-// WiFi.begin();  
- int it = 30;
- while ((WiFi.status() != WL_CONNECTED) and it>0) {  //  czekaj na połączenie z WiFi
-  delay(500);
+  EEPROM.end();
+  int it = 30;
+  while ((WiFi.status() != WL_CONNECTED) and it>0) {  //  czekaj na połączenie z WiFi
+   delay(500);
    it-- ;
- #ifdef DEBUG
-  Serial.print(".");
- #endif
+#ifdef DEBUG
+   Serial.print(".");
+#endif
   }
  
   if (it>0) {
-    #ifdef DEBUG 
+#ifdef DEBUG 
    Serial.println("");
    Serial.println("WiFi połączone");
    Serial.println(WiFi.localIP());
@@ -120,26 +107,21 @@ void setup()
    Serial.println(WiFi.channel());
    Serial.print("IP AP: ");
    Serial.println(WiFi.softAPIP() );
-   //WiFi.printDiag(Serial);
-   #endif
+#endif
    }else {
-    #ifdef DEBUG 
+#ifdef DEBUG 
    Serial.println();
    Serial.println("Brak połączenia z WiFi!.");
    Serial.println(WiFi.status());
    Serial.println("-------------------");
    Serial.println(ssid);
    Serial.println(pass);
-   #endif
- 
-   //WiFi.disconnect();
- //  WiFi.mode(WIFI_AP_STA); //tryb AP_STATION
-  // WiFi.begin();
-    }
+#endif
+     }
  
  setservers();
 
-}
+};
 
 void loop()
 {
@@ -151,19 +133,18 @@ void loop()
   currentTime = 0;
   if (WiFi.getMode() != WIFI_AP_STA){
   WiFi.mode(WIFI_AP_STA);}
-  }else
-   { // wyłącz LED gdy jest połączenie z WiFi
-   digitalWrite(pinLED, HIGH);
-    if (currentTime == 0) {
-    currentTime = (millis() + minutes5);
+ }else
+ { // wyłącz LED gdy jest połączenie z WiFi
+  digitalWrite(pinLED, HIGH);
+   if (currentTime == 0) {
+   currentTime = (millis() + minutes5);
+   };
+  if (millis() >= currentTime) {
+   if (WiFi.getMode() != WIFI_STA){
+    WiFi.mode(WIFI_STA);
     };
-    if (millis() >= currentTime) {
-     if (WiFi.getMode() != WIFI_STA){
-     WiFi.mode(WIFI_STA);
-     };
-    currentTime=0;
-    };
+   currentTime=0;
   };
-
+ };
 }
 

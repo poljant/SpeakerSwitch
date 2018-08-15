@@ -69,7 +69,6 @@ String HTMLPage1() {      // pierwsza część strony www
 	 hour = hour % 24;
 	 t  = "<h1>Speaker Switch</h1>";
 	 t += "<p> Version "+version;
-//   t += "<p> Wersja 1.0 z dnia 4-08-2018";
 	 t += "</p>";
 //	 t += "<p>Czas działania: ";
    t += "<p>Time of action: days ";
@@ -123,12 +122,10 @@ String HTMLWiFiScan(void){
 	 p +="<td>"+WiFi.BSSIDstr(i)+"</td>";	//MAC adres
 	 p +="<td>"+String(WiFi.RSSI(i))+" dBm</td>"; //siła sygnału
 	 p +="<td>";
-//	 p +=((WiFi.encryptionType(i)==ENC_TYPE_NONE) ? "nie" : "tak");//czy szyfrowanie
-//   p +=((WiFi.encryptionType(i)==ENC_TYPE_NONE) ? "no" : "yes");//czy szyfrowanie
    p +=(encrypType[WiFi.encryptionType(i)]);// szyfrowanie
 	 p +="</td><td>";
 	 //p +=((WiFi.isHidden(i)) ? "tak" : "nie");//czy sieć ukryta
-  p +=((WiFi.isHidden(i)) ? "yes" : "no");//czy sieć ukryta
+   p +=((WiFi.isHidden(i)) ? "yes" : "no");//czy sieć ukryta
 	 p +="</td></tr>";
 	 } //end for
 	 p +="</tbody></table>";
@@ -179,50 +176,46 @@ void setservers(){
 	 httpUpdate.setup(&server,"/update", www_login, www_pass); // umożliwia aktualizację poprzez WiFi
 
 	 server.on("/", [](){
-		// if(WiFi.status() == WL_CONNECTED){
-
-		// }
 	    server.send(200, "text/html", WebPage());
        //server.send(200, "text/html", ((WiFi.status() == WL_CONNECTED)? WebPage():WebPageScan()));
 	  });
 
 	 server.on("/wifiscan", [] ()
 	  {
-
 		 server.send(200, "text/html", WebPageScan());
 	  });
+   
 //ustanawia połączenie z wybraną siecią wifi
 	 server.on("/wifiset", [] ()
 	  {
     //pobierz przysłane dane
-		 String ESSID = server.arg("SSID");
-		 String Epass = server.arg("password");
+		String ESSID = server.arg("SSID");
+		String Epass = server.arg("password");
     EEPROM.begin(128);
     EEPROM.get(63, etemp);
     if(etemp == 1 or etemp == 0xFF){
       etemp=0;
-       EEPROM.put(Eetemp,etemp);
-       };
+      EEPROM.put(Eetemp,etemp);
+    };
     if (((sizeof(ESSID)>=4) && (sizeof(Epass)>=8))) { //pomiń gdy brak nazwy lub hasła
     //konwertuj ze string do char
 		 const char*	essid = ESSID.c_str();
 		 const char* epass = Epass.c_str();
-    etemp = 1;
-    #ifdef DEBUG
+     etemp = 1;
+#ifdef DEBUG
       Serial.println(WiFi.status());
       Serial.println("ESSID i Epass OK.");
       Serial.println(essid);
       Serial.println(epass);
-    #endif
+#endif
     // zapisz SSID i password do EEPROM
-    EEPROM.put(0,essid);
-    EEPROM.put(64,epass);
-    EEPROM.put(Eetemp,etemp);
- //   EEPROM.commit();
-    delay(20);
-    EEPROM.get(0,ssid);
-    EEPROM.get(64,pass);
-    EEPROM.get(Eetemp,etemp);
+     EEPROM.put(0,essid);
+     EEPROM.put(64,epass);
+     EEPROM.put(Eetemp,etemp);
+     delay(20);
+     EEPROM.get(0,ssid);
+     EEPROM.get(64,pass);
+     EEPROM.get(Eetemp,etemp);
  
 		 WiFi.disconnect() ; //rozłacz obecne połączenie
 		 WiFi.mode(WIFI_AP_STA);//ustw tryb AP+STA
@@ -230,25 +223,24 @@ void setservers(){
 		 WiFi.begin(ssid,pass); //uruchom łączenie z wybraną siecią wifi
 		 delay(200);
     }
-     EEPROM.end();
-		 int it = 20; //ustal maksymalny czas czekania na 10sek.(20x500ms)
-		 while ((WiFi.status() != WL_CONNECTED and it>0)) {  //  czekaj na połączenie z WiFi
-      #ifdef DEBUG
+    EEPROM.end();
+		int it = 20; //ustal maksymalny czas czekania na 10sek.(20x500ms)
+		while ((WiFi.status() != WL_CONNECTED and it>0)) {  //  czekaj na połączenie z WiFi
+#ifdef DEBUG
       Serial.print(".");
-      #endif
-		   delay(500);
-		   it--;
-		 }
-    //}
-      #ifdef DEBUG
+#endif
+    delay(500);
+	  it--;
+	 }
+#ifdef DEBUG
     if (it<=0){
       Serial.println("Błąd w ESSID lub Epass.");
       Serial.println(WiFi.status());
       Serial.println(ssid);
       Serial.println(pass);
       };
-      #endif
-	   server.send(200, "text/html", WebPageScan());
+#endif
+   server.send(200, "text/html", WebPageScan());
 	});
 
   server.on("/speaker/A", [] ()     //  wyłącz przekaźnik 1
