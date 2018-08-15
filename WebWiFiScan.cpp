@@ -4,6 +4,8 @@
 #include "Relay.h"
 #include <EEPROM.h>
 
+//#define POLISH
+//#define DEBUG
 extern String version;
 extern Relay R1;
 extern Relay R2;
@@ -40,7 +42,11 @@ String HTMLHeader() {           //  nagłówek strony
 	String  h = "<!DOCTYPE html>\n";
 	  h += "<html>";
 	  h += "<head>";
+#ifdef POLISH
+    h += "<meta http-equiv=\"Content-Language\" content=\"pl\" />";
+#else
     h += "<meta http-equiv=\"Content-Language\" content=\"en\" />";
+#endif
 	  h += "<title> Speaker Switchs</title>";
 	  h += "<meta charset=\"utf-8\">";
 	  h += "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
@@ -67,14 +73,24 @@ String HTMLPage1() {      // pierwsza część strony www
 	 sec = sec % 60;
 	 min = min % 60;
 	 hour = hour % 24;
+#ifdef POLISH
+   t  = "<h1>Przełącznik głośnków.</h1>";
+#else
 	 t  = "<h1>Speaker Switch</h1>";
+#endif
 	 t += "<p> Version "+version;
 	 t += "</p>";
-//	 t += "<p>Czas działania: ";
+#ifdef POLISH
+	 t += "<p>Czas działania: dni: ";
+#else
    t += "<p>Time of action: days ";
+#endif
 	 t += (days);
-//	 t += " godz:" ;
+#ifdef POLISH
+	 t += " godz:" ;
+#else
    t += " hours " ;
+#endif
 	 t += ((hour<10) ? "0" : "");  //gdy mniej niż 10 wstaw zero wiodące
 	 t += (hour);
 	 t += ":";
@@ -83,14 +99,21 @@ String HTMLPage1() {      // pierwsza część strony www
 	 t += ":";
 	 t += ((sec < 10) ? "0" : "");  //gdy mniej niż 10 wstaw zero wiodące
 	 t += (sec);
+ #ifdef POLISH
+   t += ( (R1.read()) ? "<p><a href = \"/speaker/A\"><button class=\"btn btn-danger\">GłośnikiB - ZAŁ</button></a></p>\n" : "<p><a href = \"/speaker/B\"><button class=\"btn btn-success\">GłośnikiA - ZAŁ</button></a></p>\n");
+   t += ( (R2.read()) ? "<p><a href = \"/speakerAB/0\"><button class=\"btn btn-danger\">GłośnikiA+B - ZAŁ</button></a></p>\n" : "<p><a href = \"/speakerAB/1\"><button class=\"btn btn-success\">GłośnikiA+B - WYŁ</button></a></p>\n");
+ #else
    t += ( (R1.read()) ? "<p><a href = \"/speaker/A\"><button class=\"btn btn-danger\">SpeakerB - ON</button></a></p>\n" : "<p><a href = \"/speaker/B\"><button class=\"btn btn-success\">SpeakerA - ON</button></a></p>\n");
    t += ( (R2.read()) ? "<p><a href = \"/speakerAB/0\"><button class=\"btn btn-danger\">SpeakersA+B - ON</button></a></p>\n" : "<p><a href = \"/speakerAB/1\"><button class=\"btn btn-success\">SpeakersA+B - OFF</button></a></p>\n");
- 
+ #endif
 	 t += "</p>";
-//	 t +="<p><a href = \"/wifiscan\"><button class=\"btn btn-info\">Skanuj sieć WiFi</button></a></p>";
+#ifdef POLISH
+	 t +="<p><a href = \"/wifiscan\"><button class=\"btn btn-info\">Skanuj sieć WiFi</button></a></p>";
+   t +="<p><a href = \"/\"><button class=\"btn btn-info\">Odświerz stronę</button></a></p>";
+#else
    t +="<p><a href = \"/wifiscan\"><button class=\"btn btn-info\">Scan the WiFi network.</button></a></p>";
-//  t +="<p><a href = \"/\"><button class=\"btn btn-info\">Odświerz stronę</button></a></p>";
-  t +="<p><a href = \"/\"><button class=\"btn btn-info\">Reload</button></a></p>";
+   t +="<p><a href = \"/\"><button class=\"btn btn-info\">Reload</button></a></p>";
+#endif
 	 return t;
 	}
 
@@ -99,17 +122,22 @@ String HTMLWiFiScan(void){
 	String p="";
 	String ix="";
 	uint8_t n = WiFi.scanNetworks();
-
-//	if (n == 0) return "<p>Brak sieci WiFi.</p>";
+#ifdef POLISH
+	if (n == 0) return "<p>Brak sieci WiFi.</p>";
+	p +="<div><h3>Skanowanie sieci WiFi</h3></div>";
+#else
   if (n == 0) return "<p>No WiFi networks.</p>";
-//	p +="<div><h3>Skanowanie sieci WiFi</h3></div>";
   p +="<div><h3>WiFi network scanning.</h3></div>";
+#endif
   p +="<table  align=\"center\" border=\"2\" >";
 	p +="<thead ><tr><th> </th><th style = \"text-align: center;\">SSID</th>";
-	//p +="<th>kanał</th><th style = \"text-align: center;\">MAC</th>";
+#ifdef POLISH
+	p +="<th>kanał</th><th style = \"text-align: center;\">MAC</th>";
+  p +="<th>RSSI</th><th>zabezp</th><th>ukryta</th><tr>";
+#else
   p +="<th>channel</th><th style = \"text-align: center;\">MAC</th>";
-//	p +="<th>RSSI</th><th>zabezp</th><th>ukryta</th><tr>";
   p +="<th style = \"text-align: center;\">RSSI</th><th>encryption</th><th>hidden</th><tr>";
+#endif
 	p +="</thead><tbody>";
 	 for (uint8_t i=0; i<n;i++){
 	 p +="<tr><td>";
@@ -124,43 +152,65 @@ String HTMLWiFiScan(void){
 	 p +="<td>";
    p +=(encrypType[WiFi.encryptionType(i)]);// szyfrowanie
 	 p +="</td><td>";
-	 //p +=((WiFi.isHidden(i)) ? "tak" : "nie");//czy sieć ukryta
+#ifdef POLISH
+	 p +=((WiFi.isHidden(i)) ? "tak" : "nie");//czy sieć ukryta
+#else
    p +=((WiFi.isHidden(i)) ? "yes" : "no");//czy sieć ukryta
+#endif
 	 p +="</td></tr>";
 	 } //end for
 	 p +="</tbody></table>";
 	 p +="<div><p></p> </div>";
 	 // gdy połączenie z WiFi
 	 if(WiFi.status() == WL_CONNECTED){
-//		p += "<p>Jesteś połączony z siecią </p>";
+#ifdef POLISH
+		p += "<p>Jesteś połączony z siecią </p>";
+#else
     p += "<p>Connected with WiFi </p>";
+#endif
 		p +="<table align=\"center\" border=\"2\" ><tbody>";
 		p +="<thead ><tr><th style = \"text-align: center;\">SSID</th>";
-//		p +="<th>kanał</th><th style = \"text-align: center;\">MAC</th>";
+#ifdef POLISH
+		p +="<th>kanał</th><th style = \"text-align: center;\">MAC</th>";
+#else
     p +="<th>channel</th><th style = \"text-align: center;\">MAC</th>";
+#endif
 		p +="<th style = \"text-align: center;\">RSSI</th></thead><tbody>";
 		p += "<td>"+WiFi.SSID()+"</td>";
 		p += "<td>"+String(WiFi.channel())+"</td>";
 		p += "<td>"+WiFi.BSSIDstr()+"</td>";
 		p += "<td>"+String(WiFi.RSSI())+" dBm</td></tbody></table>";
 		p +="<label>IP: "+String(IPAdrToStr(WiFi.localIP()))+"</label>";
-//		p += "<p>Aby zmienić sieć WiFi.</p>";
+#ifdef POLISH
+		p += "<p>Aby zmienić sieć WiFi.</p>";
+#else
     p += "<p>To change the WiFi network.</p>";
+#endif
 	 }else{	//gdy brak połączenia z WiFi.
-//		 p += "<p>Brak połączenia z siecią WiFi.</p>";
+#ifdef POLISH
+		 p += "<p>Brak połączenia z siecią WiFi.</p>";
+#else
      p += "<p>No connection with WiFi.</p>";
+#endif
 		 p += "<label>IP AP: "+String(IPAdrToStr(WiFi.softAPIP()))+"</label>";
 	 }	//end if
-//	 p += "<p>Wybierz sieć powyżej i podaj hasło</p>";
+#ifdef POLISH
+	 p += "<p>Wybierz sieć powyżej i podaj hasło</p>";
+	 p +="<label for=\"password\">Hasło do WiFi:</label>";
+#else
    p += "<p>Select the WiFi network above and enter the password</p>";
-//	 p +="<label for=\"password\">Hasło do WiFi:</label>";
    p +="<label for=\"password\">WiFi password:</label>";
+#endif
 	 p +="<input style=\"color: black;\" type=\"password\" name=\"password\" />" ; //required=\"required\"/>";
-//	 p +="<input style=\"text-align: center;color: black;\" type=\"submit\" value=\"Połącz z WiFi.\"/></form>";
+#ifdef POLISH
+	 p +="<input style=\"text-align: center;color: black;\" type=\"submit\" value=\"Połącz z WiFi.\"/></form>";
+	 p += "<p><a href = \"/wifiscan\"><button class=\"btn btn-info\">Skanuj ponownie</button></a></p>";
+   p += "<p><a href = \"/\"><button class=\"btn btn-info\">Strona główna</button></a></p>";  
+#else
    p +="<input style=\"text-align: center;color: black;\" type=\"submit\" value=\"Connect.\"/></form>";
-//	 p += "<p><a href = \"/wifiscan\"><button class=\"btn btn-info\">Skanuj ponownie</button></a></p>";
    p += "<p><a href = \"/wifiscan\"><button class=\"btn btn-info\">Scan again</button></a></p>";
 	 p += "<p><a href = \"/\"><button class=\"btn btn-info\">Home</button></a></p>";
+#endif
 	return p;
 }
 String WebPageScan(){

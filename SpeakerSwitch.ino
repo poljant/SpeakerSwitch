@@ -11,9 +11,10 @@
 //#define IP_STATIC
 //#define DEBUG
 //#define DEBUG_ON
+//#define POLISH
 
 
-String version = "1.0.1";
+String version = "1.0.2";
 const char* ssid = "                                                                "; //64 char
 const char* pass = "                                                                "; //64 char
 
@@ -36,6 +37,7 @@ uint8_t etemp = 0;    // zmienne określająca czy należy zmienić zawarość E
 uint8_t Eetemp = 63; //adres w EEPROM
 
 #ifdef IP_STATIC
+// ustaw dane wg swojej sieci
 IPAddress IPadr(10,110,2,105); //stały IP
 IPAddress netmask(255,255,0,0);
 IPAddress gateway(10,110,0,1);
