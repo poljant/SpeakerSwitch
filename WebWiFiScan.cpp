@@ -5,7 +5,7 @@
 #include <EEPROM.h>
 
 //#define POLISH
-//#define DEBUG
+#define DEBUG
 extern String version;
 extern Relay R1;
 extern Relay R2;
@@ -100,11 +100,19 @@ String HTMLPage1() {      // pierwsza część strony www
 	 t += ((sec < 10) ? "0" : "");  //gdy mniej niż 10 wstaw zero wiodące
 	 t += (sec);
  #ifdef POLISH
-   t += ( (R1.read()) ? "<p><a href = \"/speaker/A\"><button class=\"btn btn-danger\">GłośnikiB - ZAŁ</button></a></p>\n" : "<p><a href = \"/speaker/B\"><button class=\"btn btn-success\">GłośnikiA - ZAŁ</button></a></p>\n");
+   t += ( (!R1.read() or R2.read()) ? "<p><a href = \"/speaker/B\"><button class=\"btn btn-danger\">GłośnikiA - ZAŁ</button></a></p>\n" : "<p><a href = \"/speaker/A\"><button class=\"btn btn-success\">GłośnikiA - WYŁ</button></a></p>\n");
+   t += ( (R1.read() or R2.read()) ? "<p><a href = \"/speaker/A\"><button class=\"btn btn-danger\">GłośnikiB - ZAŁ</button></a></p>\n" : "<p><a href = \"/speaker/B\"><button class=\"btn btn-success\">GłośnikiB - WYŁ</button></a></p>\n");
    t += ( (R2.read()) ? "<p><a href = \"/speakerAB/0\"><button class=\"btn btn-danger\">GłośnikiA+B - ZAŁ</button></a></p>\n" : "<p><a href = \"/speakerAB/1\"><button class=\"btn btn-success\">GłośnikiA+B - WYŁ</button></a></p>\n");
  #else
-   t += ( (R1.read()) ? "<p><a href = \"/speaker/A\"><button class=\"btn btn-danger\">SpeakerB - ON</button></a></p>\n" : "<p><a href = \"/speaker/B\"><button class=\"btn btn-success\">SpeakerA - ON</button></a></p>\n");
+  if(R2.read()){
+   t += "<p><a href = \"/speaker/A\"><button class=\"btn btn-danger\">SpeakerA - ON</button></a></p>\n" ;
+   t += "<p><a href = \"/speaker/B\"><button class=\"btn btn-danger\">SpeakerB - ON</button></a></p>\n" ;   
+   t += "<p><a href = \"/speakerAB/0\"><button class=\"btn btn-danger\">SpeakersA+B - ON</button></a></p>\n";
+  }else{
+   t += ( (!R1.read() ) ? "<p><a href = \"/speaker/B\"><button class=\"btn btn-danger\">SpeakerA - ON</button></a></p>\n" : "<p><a href = \"/speaker/A\"><button class=\"btn btn-success\">SpeakerA - OFF</button></a></p>\n");
+   t += ( (R1.read() ) ? "<p><a href = \"/speaker/A\"><button class=\"btn btn-danger\">SpeakerB - ON</button></a></p>\n" : "<p><a href = \"/speaker/B\"><button class=\"btn btn-success\">SpeakerB - OFF</button></a></p>\n");   
    t += ( (R2.read()) ? "<p><a href = \"/speakerAB/0\"><button class=\"btn btn-danger\">SpeakersA+B - ON</button></a></p>\n" : "<p><a href = \"/speakerAB/1\"><button class=\"btn btn-success\">SpeakersA+B - OFF</button></a></p>\n");
+  }
  #endif
 	 t += "</p>";
 #ifdef POLISH
@@ -220,6 +228,10 @@ String WebPageScan(){
 String WebPage() {       // połącz wszystkie części strony www
  return (HTMLHeader()+ HTMLPage1()+HTMLFooter());
 }
+String WebPageGet() {
+
+  return (R2.read() ? "AB" : (R1.read() ? "B" : "A"));
+}
 
 // funkcja ustawia wszystkie strony www
 void setservers(){
@@ -296,12 +308,14 @@ void setservers(){
   server.on("/speaker/A", [] ()     //  wyłącz przekaźnik 1
   {
     R1.setOff();
+    R2.setOff();
     server.send(200, "text/html", WebPage());
    });
 
   server.on("/speaker/B", []()      // załącz przekaźnik 1
   {
    R1.setOn();
+   R2.setOff();
    server.send(200, "text/html", WebPage());
   }); 
 
@@ -317,6 +331,12 @@ void setservers(){
    server.send(200, "text/html", WebPage());
   }); 
 
+  server.on("/speaker/get", [] ()     //  podaj stan przekaźników
+  {
+     server.send(200, "text/html", WebPageGet());
+  });
+
+  
 server.begin();                // Start serwera www
 #ifdef DEBUG
 Serial.println("Server started");

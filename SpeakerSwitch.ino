@@ -9,12 +9,12 @@
 #define pinRelay1 D8
 #define pinRelay2 D7
 //#define IP_STATIC
-//#define DEBUG
+#define DEBUG
 //#define DEBUG_ON
 //#define POLISH
 
 
-String version = "1.0.2";
+String version = "1.0.3";
 const char* ssid = "                                                                "; //64 char
 const char* pass = "                                                                "; //64 char
 
@@ -24,7 +24,7 @@ const char* mypass = "testtest";
 //dane dla AP
 const char* ap_ssid = "SpeakerSwitch";   // SSID AP
 const char* ap_pass = "12345678";  // password do AP
-int ap_channel= 5; //numer kanału dla AP
+int ap_channel= 2; //numer kanału dla AP
 Relay R1;
 Relay R2;
 
@@ -70,8 +70,8 @@ void setup()
 #ifdef DEBUG
   Serial.print("etemp = ");
   Serial.println(etemp);
-  #endif
-  if (etemp==0xFF or etemp==0){
+#endif
+  if (etemp==0xFF or etemp==0 ){
    etemp = 1;
    EEPROM.put(0, myssid);
    EEPROM.put(64, mypass);
@@ -83,7 +83,13 @@ void setup()
    WiFi.begin(ssid, pass);
    
   }else{
-   WiFi.begin(); 
+    if(etemp==1){
+    EEPROM.get(0, ssid);
+    EEPROM.get(64, pass);  
+    }else{
+     WiFi.begin();  
+    };
+
   };
   EEPROM.end();
   int it = 30;
