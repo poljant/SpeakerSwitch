@@ -9,12 +9,12 @@
 #define pinRelay1 D8
 #define pinRelay2 D7
 //#define IP_STATIC
-#define DEBUG
+//#define DEBUG
 //#define DEBUG_ON
 //#define POLISH
 
 
-String version = "1.0.3";
+String version = "1.0.5";
 const char* ssid = "                                                                "; //64 char
 const char* pass = "                                                                "; //64 char
 
@@ -22,7 +22,7 @@ const char* myssid = "TEST";
 const char* mypass = "testtest";
 
 //dane dla AP
-const char* ap_ssid = "SpeakerSwitch";   // SSID AP
+const char* ap_ssid = "ASpeakerSwitch";   // SSID AP
 const char* ap_pass = "12345678";  // password do AP
 int ap_channel= 2; //numer kanału dla AP
 Relay R1;
@@ -32,7 +32,7 @@ extern ESP8266WebServer server;
 extern const char* modes[] ; //= {"NULL","STA","AP","STA+AP"
 extern const char* phymodes[]; // = { "","B", "G", "N"};
 unsigned long minutes5 = 60000*5;
-unsigned long currentTime = 0;
+
 uint8_t etemp = 0;    // zmienne określająca czy należy zmienić zawarość EEPROM.
 uint8_t Eetemp = 63; //adres w EEPROM
 
@@ -71,7 +71,7 @@ void setup()
   Serial.print("etemp = ");
   Serial.println(etemp);
 #endif
-  if (etemp==0xFF or etemp==0 ){
+  if (etemp==0xFF or etemp==0){
    etemp = 1;
    EEPROM.put(0, myssid);
    EEPROM.put(64, mypass);
@@ -79,18 +79,20 @@ void setup()
    delay(30); 
    EEPROM.get(0, ssid);
    EEPROM.get(64, pass);
- 
+//   WiFi.mode(WIFI_AP_STA); //tryb AP_STATION 
    WiFi.begin(ssid, pass);
    
   }else{
     if(etemp==1){
     EEPROM.get(0, ssid);
-    EEPROM.get(64, pass);  
-    }else{
-     WiFi.begin();  
+    EEPROM.get(64, pass); 
+  //  WiFi.mode(WIFI_AP_STA); //tryb AP_STATION 
+    WiFi.begin(ssid, pass);
     };
-
+ //    WiFi.mode(WIFI_AP_STA); //tryb AP_STATION
+     WiFi.begin();  
   };
+
   EEPROM.end();
   int it = 30;
   while ((WiFi.status() != WL_CONNECTED) and it>0) {  //  czekaj na połączenie z WiFi
@@ -100,9 +102,8 @@ void setup()
    Serial.print(".");
 #endif
   }
- 
+ #ifdef DEBUG 
   if (it>0) {
-#ifdef DEBUG 
    Serial.println("");
    Serial.println("WiFi połączone");
    Serial.println(WiFi.localIP());
@@ -115,17 +116,15 @@ void setup()
    Serial.println(WiFi.channel());
    Serial.print("IP AP: ");
    Serial.println(WiFi.softAPIP() );
-#endif
-   }else {
-#ifdef DEBUG 
+  }else {
    Serial.println();
    Serial.println("Brak połączenia z WiFi!.");
-   Serial.println(WiFi.status());
+   Serial.println(modes[WiFi.getMode()]);
    Serial.println("-------------------");
    Serial.println(ssid);
    Serial.println(pass);
+  }
 #endif
-     }
  
  setservers();
 
@@ -133,25 +132,30 @@ void setup()
 
 void loop()
 {
-
+  boolean ifAP = true;
+  unsigned long APtime = 0;
   server.handleClient();
- 
  if (WiFi.status() != WL_CONNECTED){
   digitalWrite(pinLED, LOW);
-  currentTime = 0;
+  APtime = 0;
+  ifAP = true;
   if (WiFi.getMode() != WIFI_AP_STA){
+    #ifdef DEBUG
+       Serial.println(WiFi.getMode());
+    #endif
   WiFi.mode(WIFI_AP_STA);}
  }else
  { // wyłącz LED gdy jest połączenie z WiFi
   digitalWrite(pinLED, HIGH);
-   if (currentTime == 0) {
-   currentTime = (millis() + minutes5);
-   };
-  if (millis() >= currentTime) {
+  
+  if (ifAP and (APtime == 0)) {
+  APtime = (millis() + minutes5);
+  };
+  if (ifAP and (millis() >= APtime)) {
    if (WiFi.getMode() != WIFI_STA){
     WiFi.mode(WIFI_STA);
+    ifAP = false;
     };
-   currentTime=0;
   };
  };
 }

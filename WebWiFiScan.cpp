@@ -5,7 +5,7 @@
 #include <EEPROM.h>
 
 //#define POLISH
-#define DEBUG
+//#define DEBUG
 extern String version;
 extern Relay R1;
 extern Relay R2;
@@ -100,9 +100,15 @@ String HTMLPage1() {      // pierwsza część strony www
 	 t += ((sec < 10) ? "0" : "");  //gdy mniej niż 10 wstaw zero wiodące
 	 t += (sec);
  #ifdef POLISH
-   t += ( (!R1.read() or R2.read()) ? "<p><a href = \"/speaker/B\"><button class=\"btn btn-danger\">GłośnikiA - ZAŁ</button></a></p>\n" : "<p><a href = \"/speaker/A\"><button class=\"btn btn-success\">GłośnikiA - WYŁ</button></a></p>\n");
-   t += ( (R1.read() or R2.read()) ? "<p><a href = \"/speaker/A\"><button class=\"btn btn-danger\">GłośnikiB - ZAŁ</button></a></p>\n" : "<p><a href = \"/speaker/B\"><button class=\"btn btn-success\">GłośnikiB - WYŁ</button></a></p>\n");
-   t += ( (R2.read()) ? "<p><a href = \"/speakerAB/0\"><button class=\"btn btn-danger\">GłośnikiA+B - ZAŁ</button></a></p>\n" : "<p><a href = \"/speakerAB/1\"><button class=\"btn btn-success\">GłośnikiA+B - WYŁ</button></a></p>\n");
+     if(R2.read()){
+   t += "<p><a href = \"/speaker/A\"><button class=\"btn btn-danger\">GłośnikiA - ZAŁ</button></a></p>\n" ;
+   t += "<p><a href = \"/speaker/B\"><button class=\"btn btn-danger\">GłośnikiB - ZAŁ</button></a></p>\n" ;   
+   t += "<p><a href = \"/speakerAB/0\"><button class=\"btn btn-danger\">SpeakersA+B - ZAŁ</button></a></p>\n";
+  }else{
+   t += ( (!R1.read() ) ? "<p><a href = \"/speaker/B\"><button class=\"btn btn-danger\">GłośnikiA - ZAŁ</button></a></p>\n" : "<p><a href = \"/speaker/A\"><button class=\"btn btn-success\">SpeakerA - WYŁ</button></a></p>\n");
+   t += ( (R1.read() ) ? "<p><a href = \"/speaker/A\"><button class=\"btn btn-danger\">GłośnikiB - ZAŁ</button></a></p>\n" : "<p><a href = \"/speaker/B\"><button class=\"btn btn-success\">SpeakerB - WYŁ</button></a></p>\n");   
+   t += ( (R2.read()) ? "<p><a href = \"/speakerAB/0\"><button class=\"btn btn-danger\">GłośnikiA+B - ZAŁ</button></a></p>\n" : "<p><a href = \"/speakerAB/1\"><button class=\"btn btn-success\">SpeakersA+B - WYŁ</button></a></p>\n");
+  }
  #else
   if(R2.read()){
    t += "<p><a href = \"/speaker/A\"><button class=\"btn btn-danger\">SpeakerA - ON</button></a></p>\n" ;
@@ -130,6 +136,7 @@ String HTMLWiFiScan(void){
 	String p="";
 	String ix="";
 	uint8_t n = WiFi.scanNetworks();
+  delay(10000);
 #ifdef POLISH
 	if (n == 0) return "<p>Brak sieci WiFi.</p>";
 	p +="<div><h3>Skanowanie sieci WiFi</h3></div>";
