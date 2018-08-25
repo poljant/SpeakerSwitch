@@ -176,6 +176,12 @@ String HTMLWiFiScan(void){
 	 } //end for
 	 p +="</tbody></table>";
 	 p +="<div><p></p> </div>";
+   return p;
+}
+String HTMLWiFiScan1(void){
+  String p="";
+  String ix="";  
+
 	 // gdy połączenie z WiFi
 	 if(WiFi.status() == WL_CONNECTED){
 #ifdef POLISH
@@ -229,7 +235,7 @@ String HTMLWiFiScan(void){
 	return p;
 }
 String WebPageScan(){
-	return (HTMLHeader()+HTMLWiFiScan()+HTMLFooter());
+	return (HTMLHeader()+HTMLWiFiScan()+HTMLWiFiScan1()+HTMLFooter());
 }
 
 String WebPage() {       // połącz wszystkie części strony www

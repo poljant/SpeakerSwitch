@@ -9,22 +9,22 @@
 #define pinRelay1 D8
 #define pinRelay2 D7
 //#define IP_STATIC
-//#define DEBUG
+#define DEBUG
 //#define DEBUG_ON
 //#define POLISH
 
 
-String version = "1.0.5";
-const char* ssid = "                                                                "; //64 char
-const char* pass = "                                                                "; //64 char
+String version = "1.0.7";
+const char* ssid = ""; //                                                               "; //64 char
+const char* pass = ""; //                                                                "; //64 char
 
 const char* myssid = "TEST";
 const char* mypass = "testtest";
 
 //dane dla AP
-const char* ap_ssid = "ASpeakerSwitch";   // SSID AP
+const char* ap_ssid = "SpeakerSwitch";   // SSID AP
 const char* ap_pass = "12345678";  // password do AP
-int ap_channel= 2; //numer kanału dla AP
+int ap_channel= 7; //numer kanału dla AP
 Relay R1;
 Relay R2;
 
@@ -32,7 +32,8 @@ extern ESP8266WebServer server;
 extern const char* modes[] ; //= {"NULL","STA","AP","STA+AP"
 extern const char* phymodes[]; // = { "","B", "G", "N"};
 unsigned long minutes5 = 60000*5;
-
+boolean ifAP = true;  //AP włączony
+unsigned long APtime = 0;  //czas pracy AP
 uint8_t etemp = 0;    // zmienne określająca czy należy zmienić zawarość EEPROM.
 uint8_t Eetemp = 63; //adres w EEPROM
 
@@ -132,10 +133,8 @@ void setup()
 
 void loop()
 {
-  boolean ifAP = true;
-  unsigned long APtime = 0;
   server.handleClient();
- if (WiFi.status() != WL_CONNECTED){
+ if (WiFi.status() != WL_CONNECTED){ //gdy brak połaczenia
   digitalWrite(pinLED, LOW);
   APtime = 0;
   ifAP = true;
@@ -143,8 +142,9 @@ void loop()
     #ifdef DEBUG
        Serial.println(WiFi.getMode());
     #endif
-  WiFi.mode(WIFI_AP_STA);}
- }else
+   WiFi.mode(WIFI_AP_STA);
+   }
+ }else                      //gdy jest połączenie
  { // wyłącz LED gdy jest połączenie z WiFi
   digitalWrite(pinLED, HIGH);
   
