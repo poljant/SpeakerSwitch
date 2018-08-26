@@ -1,46 +1,46 @@
 # SpeakerSwitch
 Speaker Switch.
 
-Układ pozwala przełączać zestawy głośników.
-W urządzeniu wykorzystany został moduł WeMos D1 mini.
-Nie we wszystkich wzmacniaczach mocy można podłączać równolegle głośniki.
-Takie podłączenie zwiększa obciążenie wzmacniacza co może powodować zniekształcenia dźwięku, lub uszkodzenie wzmacniacza.
-Dlatego jeśli już decydujemy się na podłączenie dodatkowych głośników, to należy zmniejszyć wysterowanie głośników.
+The system allows you to switch speaker sets.
+The device uses the WeMos D1 mini module.
+Not all loudspeakers can be connected in parallel with loudspeakers.
+Such connection increases the load on the amplifier which may cause sound distortion or damage to the amplifier.
+Therefore, if you decide to connect additional speakers, you should reduce the control of the speakers.
 
-Aby podłączyć głośniki należy odkręcić pokrywę.
-Złącze na dwa kable (cztery śruby) jest do podłączenia wzmacniacza.
-Należy uważać na przewody + (czerwony) i - (minus), aby nie spowodować odwrócenia faz w głośnikach, bo dźwięk może być nieprzyjemny.
-Styki od lewej lewy kanał -L+ (plus czerwony), kanał prawy -R+.
-Złącze na cztery kable (osiem śrub) jest do podłączenia głośników.
-Styki od lewej głośniki B lewy kanał +BL-, prawy kanał +BR-, 
-dalej głośniki A lewy kanał +AR-, prawy kanał +AR-.
+To connect the speakers, unscrew the cover.
+The connector for two cables (four screws) is for connecting the amplifier.
+Watch out for the + (red) and - (minus) wires, so as not to cause phase reverses in the speakers, because the sound may be unpleasant.
+Left contacts left channel -L + (plus red), right channel -R +.
+The four-cable connector (eight screws) is for connecting speakers.
+Contacts from the left speakers B the left channel + BL-, right channel + BR-,
+further loudspeakers A left channel + AR-, right channel + AR-.
 
-Przy pierwszym uruchomienou należy:
-1. Połączyć się z siecią WiFi SpeakerSwitch (password: 12345678).
-2. W przeglądarce www wpisać http://192.168.4.1
-3. Gdy strona www się uruchomi należy wybrać "Scan the WiFi Network",
-4. Po krótkiej chwili na ekranie ukarze się tabela z dostępnymi sieciami WiFi.
-   Należy zaznaczyć tę sieć, z którą chcemy się połączyć,
-   wpisać hasło do tej sieci i wcisnąć "Connect".
-5. Jeśli nie popełniłeś żadnego błędu, po krótkiej chwili na ekranie będzie komunikat, że zostałeś połączony z siecią WiFi i wyświetlony będzie adres IP naszego urządzenia w tej sieci. Należy zapamiętać ten IP - potrzebny do łączenia się z naszym urządzeniem.
-6. Jeśli nie uzyskamy połączenia, czynność tę należy powtórzyć (4 i 5).
-7. Po połączeniu z wybrany WiFi układ przełącza się stan STATION i po 5 minutach przestaje być widoczna sieć WiFi SpeakerSwitch. Po zerwanu połączenia z naszą siecią ponownie jest dostępny AP SpeakerSwitch.
+The first time you start:
+1. Connect to the WiFi network SpeakerSwitch (password: 12345678).
+2. Enter the web browser http://192.168.4.1
+3. When the web page is launched, select "Scan the WiFi Network",
+4. After a short while, a table with available WiFi networks will be displayed on the screen.
+   Select the network with which you want to connect,
+   enter the password for this network and press "Connect".
+5. If you have not made any mistake, after a short time the message will appear on the screen that you have been connected to the WiFi network and will display the IP address of our device in this network. Remember this IP - needed to connect to our device.
+6. If we do not get a connection, this should be repeated (4 and 5).
+7. After connecting to the chosen WiFi system, the STATION state switches and after 5 minutes the WiFi SpeakerSwitch network is no longer visible. After the connection to our network is broken, AP SpeakerSwitch is available again.
 
-Teraz możemy połączyć się z naszą siecią WiFi i połączyć się z urządzeniem
-	http://IP  (IP naszego urządzenia).
+Now we can connect to our WiFi network and connect to the device
+	http://IP  (IP of our device).
 
-Sterowanie głośników jest za pomocą przycisków na stronie www.
+Speaker control is using the buttons on the website.
 
-"SpeakerA - ON" (kolor czerwony) - załączone głośniki A.
-"SpeakerB - ON" (kolor czerwony) - załączone głośniki B.
-"SpeakersA+B - OFF" (kolor zielony) - załączone głośniki zgodnie z poprzednimi przyciskami.
-"SpeakersA+B - ON" {kolor czerwony) - załączone oba zestawy głośników.
+"SpeakerA - ON" (red colour) - attached speakers A.
+"SpeakerB - ON" (red colour) - attached speakers B.
+"SpeakersA+B - OFF" (green color) - speakers attached according to previous buttons.
+"SpeakersA+B - ON" {red colour) - both loudspeakers included.
 
-Sterowanie zdalne.
-W stanie normalnym (bez zasilania) załączone są głośniki A.
-http://IP/speaker/B - załącza tylko głośniki B, rozłacza pozostałe
-http://IP/speaker/A - załącza tylko głośniki A. rozłącza pozostałe
-http://IP/speakerAB/1 - załącza wszystkie głośniki A i B.
-http://IP/speakerAB/0 - rozłącza pracę równoległą głośników, załączone głośniki A lub B 
-                        zależy od stanu przełączników "SpeakerA - ON" lub "SpeakerB- ON".
+Remote control.
+In normal state (without power supply), the A speakers are connected.
+http://IP/speaker/B - it only turns on the B speakers, it distorts the others
+http://IP/speaker/A - it only turns on the A speakers, it distorts the others
+http://IP/speakerAB/1 - attaches all A and B speakers
+http://IP/speakerAB/0 - disconnects the speaker's parallel operation, attached speakers A or B
+                         depends on the state of the switches "SpeakerA - ON" or "SpeakerB- ON".
                         
