@@ -14,7 +14,7 @@
 //#define POLISH
 
 
-String version = "1.0.7";
+String version = "1.0.8";
 const char* ssid = ""; //                                                               "; //64 char
 const char* pass = ""; //                                                                "; //64 char
 

@@ -136,7 +136,7 @@ String HTMLWiFiScan(void){
 	String p="";
 	String ix="";
 	uint8_t n = WiFi.scanNetworks();
-  delay(10000);
+  delay(100);
 #ifdef POLISH
 	if (n == 0) return "<p>Brak sieci WiFi.</p>";
 	p +="<div><h3>Skanowanie sieci WiFi</h3></div>";
